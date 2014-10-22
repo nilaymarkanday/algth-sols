@@ -1,48 +1,78 @@
+import java.util.HashMap;
 
 public class Lecture2 {
-
-  public static int[] d;
-  public static int[][] s;
-  public static int[][] cache;
-
-  public static int m(int[] dims) {
-    d = dims;
-    return m(1, d.length - 1);
+  public static void main(String[] args) {
+    int n = Integer.parseInt(args[0]), k = Integer.parseInt(args[1]);
+    System.out.println(partitions(n, k));
   }
 
-  public static int m(int i, int j) {
-    if (s == null) {
-      int m = d.length - 1;
-      s = new int[m][m];
-      cache = new int[m][m];
-    }
+  public static long[] factorialCache;
+  public static long[][] binomialCache;
+  public static HashMap<String, Long> cache;
 
-    if (i == j) {
+  public static long partitions(int n, int k) {
+    factorialCache = new long[n + 1];
+    binomialCache = new long[n + 1][n + 1];
+    cache = new HashMap<String, Long>();
+    return g(1, n, k);
+  }
+
+  public static long g(int b, int n, int k) {
+    if (b < 0) {
       return 0;
     }
 
-    if (cache[i - 1][j - 1] != 0) {
-      return cache[i - 1][j - 1];
+    if (b == 0 || n == 0 || k < 2) {
+      return 1;
     }
 
-    int mm = Integer.MAX_VALUE;
+    String key = b + "|" + n + "|" + k;
 
-    for (int k = i; k < j; k++) {
-      int t = m(i, k) + m(k + 1, j) + d[i - 1] * d[k] * d[j];
+    if (cache.containsKey(key)) {
+      return cache.get(key);
+    }
 
-      if (t < mm) {
-        mm = t;
-        s[i - 1][j - 1] = k;
+    if (b >= n) {
+      long sum = 0;
+      for (int t = 1; t <= n + 1; t++) {
+        int sign = t % 2 == 0 ? -1 : 1;
+        sum += binomial(n + 1, t) * g(b - t, n, k) * sign;
       }
-    }
 
-    cache[i - 1][j - 1] = mm;
-    return mm;
+      cache.put(key, sum);
+      return sum;
+    } else {
+      long r = g(b - 1, n, k) + g(b * k, n - 1, k);
+      cache.put(key, r);
+      return r;
+    }
   }
 
+  public static long binomial(int n, int k) {
+    if (binomialCache[n][k] != 0) {
+      return binomialCache[n][k];
+    }
 
+    long f = factorial(n) / (factorial(k) * factorial(n - k));
+    binomialCache[n][k] = f;
+    return f;
+  }
 
-  public static void main(String[] args) {
-    System.out.println(m(new int[] {30, 35, 15, 5, 10, 20, 25, 30, 35, 15, 5, 10, 20, 25, 30, 35, 15, 5, 10, 20, 25, 30, 35, 15, 5, 10, 20, 25}));
+  public static long factorial(int l) {
+
+    if (l == 0) 
+      return 1;
+
+    if (factorialCache[l] != 0) {
+      return factorialCache[l];
+    }
+
+    long f = l;
+    while (l-- > 1) {
+      f *= l;
+    }
+
+    factorialCache[l] = f;
+    return f;
   }
 }

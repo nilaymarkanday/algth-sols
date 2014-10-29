@@ -1,40 +1,52 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 public class Lecture3 {
-  public static void main(String[] args) {
-    // String s1 = "informatics";
-    // String s2 = "interpolation";
-
-    System.out.println("Edit distance is: " + editDistance(args[0], args[1]));
+  public static void main(String[] args) throws Exception {
+    
+    processPyramid(readDataIntoPyramid("Lecture3.data.txt"));
   }
 
-  public static int editDistance(String s1, String s2) {
-    int[][] costs = new int[s1.length() + 1][s2.length() + 1];
-
-    for (int j = 0; j < s2.length() + 1; j++) {
-      costs[0][j] = j;
-    }
-
-    for (int i = 0; i < s1.length() + 1; i++) {
-      costs[i][0] = i;
-    }
-
-
-    for (int i = 1; i < s1.length() + 1; i++) {
-      for (int j = 1; j < s2.length() + 1; j++) {
-        int up = costs[i - 1][j] + 1, left = costs[i][j - 1] + 1, diagonal = costs[i - 1][j - 1] + (s1.charAt(i - 1) == s2.charAt(j - 1) ? 0 : 1);
-        int min = 0;
-        if (up <= left && up <= diagonal) {
-          min = up;
-        } else if (left <= up && left <= diagonal) {
-          min = left;
-        } else {
-          min = diagonal;
-        }
-
-        costs[i][j] = min;
+  public static void processPyramid(int height) {
+    for (int i = height - 2; i >= 0; i--) {
+      for (int j = 0; j <= i; j++) {
+        pyramid[i][j] += (pyramid[i + 1][j] > pyramid[i + 1][j + 1] ? pyramid[i + 1][j] : pyramid[i + 1][j + 1]);
       }
     }
 
-    return costs[s1.length()][s2.length()];
+    System.out.println(pyramid[0][0]);
   }
+
+  public static void printPyramid() {
+    for (int[] row : pyramid) {
+      for (int cell : row) {
+        System.out.print(cell + " ");
+      }
+
+      System.out.println();
+    }
+  }
+
+  public static int readDataIntoPyramid(String file) throws Exception {
+    pyramid = new int[100][100];
+    BufferedReader br = new BufferedReader(new FileReader(file));
+    String line;
+
+    int i = 0;
+    while ((line = br.readLine()) != null) {
+      String[] strData = line.split(" ");
+
+      int j = 0;
+      for (String strNum : strData) {
+        pyramid[i][j++] = Integer.parseInt(strNum);
+      }
+
+      i++;
+    }
+
+    return i;
+  }
+
+  public static int[][] pyramid;
+
 }

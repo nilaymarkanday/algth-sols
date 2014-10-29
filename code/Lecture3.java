@@ -1,49 +1,40 @@
-import java.util.HashMap;
 
 public class Lecture3 {
   public static void main(String[] args) {
-    list = new int[] {10, 2, 3, 4, 5};
-    p = new HashMap<String, Integer>();
-    g = new HashMap<String, Integer>();
+    // String s1 = "informatics";
+    // String s2 = "interpolation";
 
-    System.out.println(p(0, 2));
+    System.out.println("Edit distance is: " + editDistance(args[0], args[1]));
   }
 
-  public static int[] list;
+  public static int editDistance(String s1, String s2) {
+    int[][] costs = new int[s1.length() + 1][s2.length() + 1];
 
-  public static int g(int i, int j) {
-    if (i == j) {
-      return list[2 * i];
+    for (int j = 0; j < s2.length() + 1; j++) {
+      costs[0][j] = j;
     }
 
-    String key = i + "|" + j;
-    if (g.containsKey(key)) return g.get(key);
-
-    g.put(key, g(i, j - 1) + list[2 * j - 1] + g(j, j));
-    return g.get(key);
-  }
-
-  public static int p(int i, int j) {
-    if (i == j) {
-      return 0;
+    for (int i = 0; i < s1.length() + 1; i++) {
+      costs[i][0] = i;
     }
 
-    String key = i + "|" + j;
-    if (p.containsKey(key)) return p.get(key);
 
-    int min = Integer.MAX_VALUE;
+    for (int i = 1; i < s1.length() + 1; i++) {
+      for (int j = 1; j < s2.length() + 1; j++) {
+        int up = costs[i - 1][j] + 1, left = costs[i][j - 1] + 1, diagonal = costs[i - 1][j - 1] + (s1.charAt(i - 1) == s2.charAt(j - 1) ? 0 : 1);
+        int min = 0;
+        if (up <= left && up <= diagonal) {
+          min = up;
+        } else if (left <= up && left <= diagonal) {
+          min = left;
+        } else {
+          min = diagonal;
+        }
 
-    for (int l = i + 1; l <= j; l++) {
-      int temp = p(i, l - 1) + p(l, j);
-
-      if (temp < min) {
-        min = temp;
+        costs[i][j] = min;
       }
     }
 
-    p.put(key, g(i, j) + min);
-    return p.get(key);
+    return costs[s1.length()][s2.length()];
   }
-
-  public static HashMap<String, Integer> p, g;
 }
